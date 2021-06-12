@@ -79,15 +79,26 @@ if [ "ubuntu" = "ubuntu" ]; then
 
 	printc "  Installing system themes\n" "i"
 	printc "    gruvbox-material-gtk\n" "i"
+    printc "      Cloning to /tmp/gruvbox-material-gtk\n" "i"
  	git clone https://github.com/sainnhe/gruvbox-material-gtk /tmp/gruvbox-material-gtk
-	cp /tmp/tmp/gruvbox-material-gtk/themes/* /usr/share/themes
-	cp /tmp/tmp/gruvbox-material-gtk/icons/* /usr/share/icons
+    printc "      Copy file\n" "i"
+	cp -rf /tmp/gruvbox-material-gtk/themes/* /usr/share/themes
+	cp -rf /tmp/gruvbox-material-gtk/icons/* /usr/share/icons
+    printc "      Removing /tmp/gruvbox-material-gtk\n" "i"
+    rm -rf /tmp/gruvbox-material-gtk/icons/
+    printc "      Updating gtk icons\n" "i"
+    gtk-update-icon-cache /usr/share/icons/Gruvbox-Material-Dark/
 	printc "    Nordic\n" "i"
+    printc "      Cloning to /tmp/Nordic\n" "i"
 	git clone https://github.com/EliverLara/Nordic /tmp/Nordic
-	cp /tmp/tmp/Nordic/ /usr/share/themes
+    printc "      Copy file\n" "i"
+	cp -rf /tmp/Nordic/ /usr/share/themes
+    printc "      Removing /tmp/Nordic\n" "i"
+    rm -rf /tmp/Nordic/
 	printc "    arc-theme\n" "i"
-# sudo apt-get install arc-theme
-
+    sudo apt-get install arc-theme
+    
+    sudo apt autoremove -y
 	printc "  Installing terminal themes\n" "i"
 	printc "    gruvbox\n" "i"
 # clone the repo into "$HOME/src/gogh"
