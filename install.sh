@@ -79,9 +79,12 @@ if [ "ubuntu" = "ubuntu" ]; then
 
 	printc "  Installing system themes\n" "i"
 	printc "    gruvbox-material-gtk\n" "i"
-# git clone https://github.com/sainnhe/gruvbox-material-gtk /tmp/gruvbox-material-gtk
+ 	git clone https://github.com/sainnhe/gruvbox-material-gtk /tmp/gruvbox-material-gtk
+	cp /tmp/tmp/gruvbox-material-gtk/themes/* /usr/share/themes
+	cp /tmp/tmp/gruvbox-material-gtk/icons/* /usr/share/icons
 	printc "    Nordic\n" "i"
-# git clone https://github.com/EliverLara/Nordic /tmp/Nordic
+	git clone https://github.com/EliverLara/Nordic /tmp/Nordic
+	cp /tmp/tmp/Nordic/ /usr/share/themes
 	printc "    arc-theme\n" "i"
 # sudo apt-get install arc-theme
 
