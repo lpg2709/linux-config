@@ -3,7 +3,7 @@
 # Print pretty color output
 #  $1: The message to be printed with the color level
 #  $2: The message level
-#    s = success | w = warning | e = error | i = information | l = log
+#	s = success | w = warning | e = error | i = information | l = log
 function printc(){
 	CLEAR_COLOR="\033[0m"
 	l=$2
@@ -68,47 +68,110 @@ if [ "ubuntu" = "ubuntu" ]; then
 	printc "  Updating the system\n" "i"
 	#sudo apt update && sudo apt upgrade -y
 	printc "  Installing major programs ( build-essential | net-tools | vim | git | gcc | make | cmake | curl | wget )\n" "i"
-	sudo apt-get install build-essential net-tools vim git gcc make cmake curl wget -y
+	sudo apt-get install build-essential net-tools vim git gcc make cmake curl wget jq -y
 	printc "  Checking instalation" "l"
 	check_execution "exit"
 
-	printc "  Installing other programs ( htop | jq | clang | ksnip | psensor | vlc | gimp | peek )\n" "i"
-	sudo apt-get install htop jq clang ksnip psensor vlc gimp peek -y
+	printc "  Installing other programs ( htop | jq | clang | ksnip | psensor | vlc | gimp | peek | vim-gtk )\n" "i"
+	sudo apt-get install htop jq clang ksnip psensor vlc gimp peek vim-gtk -y
+	printc "  Checking instalation" "l"
+	check_execution "exit"
+
+	printc "  Installing NodeJS with NVM\n" "i"
+	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+	source ~/.bashrc
+	nvm install node
 	printc "  Checking instalation" "l"
 	check_execution "exit"
 
 	printc "  Installing system themes\n" "i"
-	printc "    gruvbox-material-gtk\n" "i"
-    printc "      Cloning to /tmp/gruvbox-material-gtk\n" "i"
+	printc "	arc-theme\n" "i"
+	sudo apt-get install arc-theme
+
+	printc "	Papirus Icon Theme\n" "i"
+	printc "	  Cloning to /tmp/papirus-icon-theme\n" "i"
+	git clone https://github.com/PapirusDevelopmentTeam/papirus-icon-theme.git /tmp/papirus-icon-theme
+	printc "	  Copy file\n" "i"
+	sudo cp -rf /tmp/papirus-icon-theme/Papirus /usr/share/icons
+	sudo cp -rf /tmp/papirus-icon-theme/Papirus-Dark /usr/share/icons
+	printc "	  Removing /tmp/papirus-icon-theme\n" "i"
+	sudo rm -rf /tmp/papirus-icon-theme/
+	printc "	  Updating gtk icons\n" "i"
+	sudo gtk-update-icon-cache /usr/share/icons/Papirus
+	sudo gtk-update-icon-cache /usr/share/icons/Papirus-Dark
+
+	printc "	gruvbox-material-gtk\n" "i"
+	printc "	  Cloning to /tmp/gruvbox-material-gtk\n" "i"
  	git clone https://github.com/sainnhe/gruvbox-material-gtk /tmp/gruvbox-material-gtk
-    printc "      Copy file\n" "i"
-	cp -rf /tmp/gruvbox-material-gtk/themes/* /usr/share/themes
-	cp -rf /tmp/gruvbox-material-gtk/icons/* /usr/share/icons
-    printc "      Removing /tmp/gruvbox-material-gtk\n" "i"
-    rm -rf /tmp/gruvbox-material-gtk/icons/
-    printc "      Updating gtk icons\n" "i"
-    gtk-update-icon-cache /usr/share/icons/Gruvbox-Material-Dark/
-	printc "    Nordic\n" "i"
-    printc "      Cloning to /tmp/Nordic\n" "i"
-	git clone https://github.com/EliverLara/Nordic /tmp/Nordic
-    printc "      Copy file\n" "i"
-	cp -rf /tmp/Nordic/ /usr/share/themes
-    printc "      Removing /tmp/Nordic\n" "i"
-    rm -rf /tmp/Nordic/
-	printc "    arc-theme\n" "i"
-    sudo apt-get install arc-theme
-    
-    sudo apt autoremove -y
-	printc "  Installing terminal themes\n" "i"
-	printc "    gruvbox\n" "i"
+	printc "	  Copy file\n" "i"
+	sudo cp -rf /tmp/gruvbox-material-gtk/themes/* /usr/share/themes
+	sudo cp -rf /tmp/gruvbox-material-gtk/icons/* /usr/share/icons
+	printc "	  Removing /tmp/gruvbox-material-gtk\n" "i"
+	sudo rm -rf /tmp/gruvbox-material-gtk/icons/
+	printc "	  Updating gtk icons\n" "i"
+	sudo gtk-update-icon-cache /usr/share/icons/Gruvbox-Material-Dark/
+
+	printc "	Nordic\n" "i"
+	printc "	  Cloning to /tmp/Nordic\n" "i"
+	sudo git clone https://github.com/EliverLara/Nordic /tmp/Nordic
+	printc "	  Copy file\n" "i"
+	sudo cp -rf /tmp/Nordic/ /usr/share/themes
+	printc "	  Removing /tmp/Nordic\n" "i"
+	sudo rm -rf /tmp/Nordic/
+
+	printc "	Juno\n" "i"
+	printc "	  Cloning to /tmp/Juno\n" "i"
+	git clone https://github.com/EliverLara/Juno /tmp/Juno
+	printc "	  Copy file\n" "i"
+	sudo cp -rf /tmp/Juno/ /usr/share/themes
+	printc "	  Removing /tmp/Juno\n" "i"
+	sudo rm -rf /tmp/Juno/
+
+	printc "	Yaru-Colors\n" "i"
+	printc "	  Cloning to /tmp/Yaru\n" "i"
+	git clone https://github.com/Jannomag/Yaru-Colors.git /tmp/Yaru
+	printc "	  Copy file\n" "i"
+	sudo cp -rf /tmp/Yaru/Themes/Yaru-Blue-dark /usr/share/themes
+	sudo cp -rf /tmp/Yaru/Themes/Yaru-MATE-dark /usr/share/themes
+	sudo cp -rf /tmp/Yaru/Themes/Yaru-Teal-dark /usr/share/themes
+	sudo cp -rf /tmp/Yaru/Icons/Yaru-Blue /usr/share/icons
+	sudo cp -rf /tmp/Yaru/Icons/Yaru-MATE /usr/share/icons
+	sudo cp -rf /tmp/Yaru/Icons/Yaru-Teal /usr/share/icons
+	printc "	  Removing /tmp/Yaru\n" "i"
+	sudo rm -rf /tmp/Yaru/
+	printc "	  Updating gtk icons\n" "i"
+	sudo gtk-update-icon-cache /usr/share/icons/Yaru-Blue
+	sudo gtk-update-icon-cache /usr/share/icons/Yaru-MATE
+	sudo gtk-update-icon-cache /usr/share/icons/Yaru-Teal
+
+
+	printc "	Flatery Icons\n" "i"
+	printc "	  Cloning to /tmp/Flatery\n" "i"
+	git clone https://github.com/cbrnix/Flatery.git /tmp/Flatery
+	printc "	  Copy file\n" "i"
+	sudo cp -rf /tmp/Flatery/Flatery-Blue-Dark /usr/share/icons
+	sudo cp -rf /tmp/Flatery/Flatery-Green-Dark /usr/share/icons
+	sudo cp -rf /tmp/Flatery/Flatery-Mint-Dark /usr/share/icons
+	sudo cp -rf /tmp/Flatery/Flatery-Teal-Dark /usr/share/icons
+	printc "	  Removing /tmp/Flatery\n" "i"
+	sudo rm -rf /tmp/Flatery/
+	printc "	  Updating gtk icons\n" "i"
+	sudo gtk-update-icon-cache /usr/share/icons/Flatery-Blue-Dark
+	sudo gtk-update-icon-cache /usr/share/icons/Flatery-Mint-Dark
+	sudo gtk-update-icon-cache /usr/share/icons/Flatery-Teal-Dark
+	sudo gtk-update-icon-cache /usr/share/icons/Flatery-Green-Dark
+
+	sudo apt autoremove -y
+# printc "  Installing terminal themes\n" "i"
+# printc "	gruvbox\n" "i"
 # clone the repo into "$HOME/src/gogh"
-#mkdir -p "$HOME/src"
-#cd "$HOME/src"
-#git clone https://github.com/Mayccoll/Gogh.git gogh
-#cd gogh/themes
+# mkdir -p "$HOME/src"
+# cd "$HOME/src"
+# git clone https://github.com/Mayccoll/Gogh.git gogh
+# cd gogh/themes
 
 # necessary on ubuntu
-#export TERMINAL=gnome-terminal
+# export TERMINAL=gnome-terminal
 
 # install themes
 #./gruvbox-dark.sh
