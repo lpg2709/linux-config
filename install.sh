@@ -1,5 +1,43 @@
 #!/usr/bin/env bash
 
+#printc "Sucesso\n" "s"
+#printc "Aviso\n" "w"
+#printc "Erro\n" "e"
+#printc "Informação\n" "i"
+#printc "Log\n" "l"
+#Get OS info
+#os_info=$(cat /etc/[A-Za-z]*[-][rv]e[lr]*)
+
+# Constants configuration
+ICONS_FOLDER="/usr/share/icons"
+THEMES_FOLDER="/usr/share/themes"
+
+TMP_PAPIRUS="/tmp/papirus-icon-theme"
+TMP_GRUVBOX="/tmp/gruvbox-material-gtke"
+TMP_NORDIC="/tmp/Nordic"
+TMP_JUNO="/tmp/Juno"
+TMP_YARU="/tmp/Yaru"
+
+PAPIRUS_ICONS_FOLDERS=("Papirus" "Papirus-Dark")
+
+# Configurations options variables
+OS_DEBIAN=0
+OS_ARCH=0
+UPDATE_UPGRADE=0
+REQUIRED=0
+OTHER=0
+THEMES_ALL=0
+ICONS_ALL=0
+THEME_ARC=0
+THEME_GRUVBOX=0
+THEME_NORDIC=0
+THEME_JUNU=0
+THEME_YARU=0
+ICONS_PAPIRUS=0
+ICONS_GRUVBOX=0
+ICONS_YARU=0
+ICONS_FLATERY=0
+
 # Print pretty color output
 #  $1: The message to be printed with the color level
 #  $2: The message level
@@ -43,139 +81,257 @@ function check_execution(){
 
 }
 
-if [ ! "$(id -u)" -eq "0" ];then
+read -r -d "" USAGE <<- EOM
+Usage: sudo ./install.sh [OPTIONS]
+
+OPTIONS:
+  -h,  --help            This help screen.
+  -u,  --update-upgarde  Update and upgrade the system.
+  -d,  --debian          Configuration for Debian based linux.
+  -a,  --arch            Configuration for Arch based linux.
+  -r,  --required        Install the required programs.
+  -o,  --other           Install the other programs.
+       --all             Install all configuration.
+       --theme-all       Install all themes.
+       --icons-all       Install all icons.
+       --theme-arc       Install arc-theme.
+       --theme-gruvbox   Install Gruvbox meterial theme.
+       --theme-nordic    Install Nordic theme.
+       --theme-junu      Install Juno theme.
+       --theme-yaru      Install Yaru Colors  theme.
+       --icons-papirus   Install Papirus Icons.
+       --icons-gruvbox   Install Papirus Icons.
+       --icons-yaru      Install Papirus Icons.
+       --icons-flatery   Install Flatery Icons.
+EOM
+
+
+while (( "$#" )); do
+	if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+		echo "$USAGE"
+		exit 0
+	fi
+	if [[ "$1" == "--update-upgrade" || "$1" == "-u" ]]; then
+		UPDATE_UPGRADE=1
+	fi
+	if [[ "$1" == "--debian" || "$1" == "-d" ]]; then
+		OS_DEBIAN=1
+	fi
+	if [[ "$1" == "--arch" || "$1" == "-a" ]]; then
+		OS_ARCH=1
+	fi
+	if [[ "$1" == "--required" || "$1" == "-r" ]]; then
+		REQUIRED=1
+	fi
+	if [[ "$1" == "--other" || "$1" == "-o" ]]; then
+		OTHER=1
+	fi
+	if [[ "$1" == "--all" ]]; then
+		REQUIRED=1
+		OTHER=1
+		THEMES_ALL=1
+		ICONS_ALL=1
+	fi
+	if [[ "$1" == "--theme-all" ]]; then
+		THEMES_ALL=1
+	fi
+	if [[ "$1" == "--icons-all" ]]; then
+		ICONS_ALL=1
+	fi
+	if [[ "$1" == "--theme-arc" ]]; then
+		THEME_ARC=1
+	fi
+	if [[ "$1" == "--theme-gruvbox" ]]; then
+		THEME_GRUVBOX=1
+	fi
+	if [[ "$1" == "--theme-nordic" ]]; then
+		THEME_NORDIC=1
+	fi
+	if [[ "$1" == "--theme-juno" ]]; then
+		THEME_JUNU=1
+	fi
+	if [[ "$1" == "--theme-yaru" ]]; then
+		THEME_YARU=1
+	fi
+	if [[ "$1" == "--icons-papirus" ]]; then
+		ICONS_PAPIRUS=1
+	fi
+	if [[ "$1" == "--icons-gruvbox" ]]; then
+		ICONS_GRUVBOX=1
+	fi
+	if [[ "$1" == "--icons-yaru" ]]; then
+		ICONS_YARU=1
+	fi
+	if [[ "$1" == "--icons-flatery" ]]; then
+		ICONS_FLATERY=1
+	fi
+
+	shift
+done
+
+# Check if is root user
+if [[ ! "$(id -u)" -eq "0" ]];then
 	printc "\nError: Root user is required!\n\n" "e"
 	exit 1
 fi
 
-#printc "Sucesso\n" "s"
-#printc "Aviso\n" "w"
-#printc "Erro\n" "e"
-#printc "Informação\n" "i"
-#printc "Log\n" "l"
+if [[ THEMES_ALL -eq 1 ]]; then
+	THEME_ARC=1
+	THEME_GRUVBOX=1
+	THEME_NORDIC=1
+	THEME_JUNU=1
+	THEME_YARU=1
+fi
 
-# Get OS info
-# os_info=$(cat /etc/[A-Za-z]*[-][rv]e[lr]*)
+if [[ ICONS_ALL -eq 1 ]]; then
+	ICONS_PAPIRUS=1
+	ICONS_GRUVBOX=1
+	ICONS_YARU=1
+	ICONS_FLATERY=1
+fi
 
-printc "\nStarting system configuration...\n" "i"
-printc "Checking system base\n" "l"
-
-if [ "ubuntu" = "ubuntu" ]; then
+if [[ $OS_DEBIAN -eq 1 ]]; then
+	printc "\nStarting system configuration...\n" "i"
 	printc "Current system use debian as base\n" "i"
 	printc "  Checking package maneger (apt-get)" "l"
 	apt-get -v > /dev/null
 	check_execution "exit"
-	printc "  Updating the system\n" "i"
-	#sudo apt update && sudo apt upgrade -y
-	printc "  Installing major programs ( build-essential | net-tools | vim | git | gcc | make | cmake | curl | wget )\n" "i"
-	sudo apt-get install build-essential net-tools vim git gcc make cmake curl wget jq -y
-	printc "  Checking instalation" "l"
-	check_execution "exit"
+	if [[ $UPDATE_UPGRADE -eq 1 ]]; then
+		printc "  Updating the system\n" "i"
+		sudo apt update && sudo apt upgrade -y
+	fi
+	if [[ $REQUIRED -eq 1 ]]; then
+		printc "  Installing major programs ( build-essential | net-tools | vim | git | gcc | make | cmake | python3 | curl | wget | htop )\n" "i"
+		sudo apt-get install build-essential net-tools vim git gcc make cmake python3 curl wget htop -y
+		printc "  Checking instalation" "l"
+		check_execution "exit"
+	fi
 
-	printc "  Installing other programs ( htop | jq | clang | ksnip | psensor | vlc | gimp | peek | vim-gtk )\n" "i"
-	sudo apt-get install htop jq clang ksnip psensor vlc gimp peek vim-gtk -y
-	printc "  Checking instalation" "l"
-	check_execution "exit"
+	if [[ $OTHER -eq 1 ]]; then
+		printc "  Installing other programs ( jq | clang | ksnip | psensor | vlc | gimp | peek | vim-gtk )\n" "i"
+		sudo apt-get install jq clang ksnip psensor vlc gimp peek vim-gtk -y
+		printc "  Checking instalation" "l"
+		check_execution "exit"
 
-	printc "  Installing NodeJS with NVM\n" "i"
-	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-	source ~/.bashrc
-	nvm install node
-	printc "  Checking instalation" "l"
-	check_execution "exit"
-
-	printc "  Installing system themes\n" "i"
-	printc "	arc-theme\n" "i"
-	sudo apt-get install arc-theme
-
-	printc "	Papirus Icon Theme\n" "i"
-	printc "	  Cloning to /tmp/papirus-icon-theme\n" "i"
-	git clone https://github.com/PapirusDevelopmentTeam/papirus-icon-theme.git /tmp/papirus-icon-theme
-	printc "	  Copy file\n" "i"
-	sudo cp -rf /tmp/papirus-icon-theme/Papirus /usr/share/icons
-	sudo cp -rf /tmp/papirus-icon-theme/Papirus-Dark /usr/share/icons
-	printc "	  Removing /tmp/papirus-icon-theme\n" "i"
-	sudo rm -rf /tmp/papirus-icon-theme/
-	printc "	  Updating gtk icons\n" "i"
-	sudo gtk-update-icon-cache /usr/share/icons/Papirus
-	sudo gtk-update-icon-cache /usr/share/icons/Papirus-Dark
-
-	printc "	gruvbox-material-gtk\n" "i"
-	printc "	  Cloning to /tmp/gruvbox-material-gtk\n" "i"
- 	git clone https://github.com/sainnhe/gruvbox-material-gtk /tmp/gruvbox-material-gtk
-	printc "	  Copy file\n" "i"
-	sudo cp -rf /tmp/gruvbox-material-gtk/themes/* /usr/share/themes
-	sudo cp -rf /tmp/gruvbox-material-gtk/icons/* /usr/share/icons
-	printc "	  Removing /tmp/gruvbox-material-gtk\n" "i"
-	sudo rm -rf /tmp/gruvbox-material-gtk/icons/
-	printc "	  Updating gtk icons\n" "i"
-	sudo gtk-update-icon-cache /usr/share/icons/Gruvbox-Material-Dark/
-
-	printc "	Nordic\n" "i"
-	printc "	  Cloning to /tmp/Nordic\n" "i"
-	sudo git clone https://github.com/EliverLara/Nordic /tmp/Nordic
-	printc "	  Copy file\n" "i"
-	sudo cp -rf /tmp/Nordic/ /usr/share/themes
-	printc "	  Removing /tmp/Nordic\n" "i"
-	sudo rm -rf /tmp/Nordic/
-
-	printc "	Juno\n" "i"
-	printc "	  Cloning to /tmp/Juno\n" "i"
-	git clone https://github.com/EliverLara/Juno /tmp/Juno
-	printc "	  Copy file\n" "i"
-	sudo cp -rf /tmp/Juno/ /usr/share/themes
-	printc "	  Removing /tmp/Juno\n" "i"
-	sudo rm -rf /tmp/Juno/
-
-	printc "	Yaru-Colors\n" "i"
-	printc "	  Cloning to /tmp/Yaru\n" "i"
-	git clone https://github.com/Jannomag/Yaru-Colors.git /tmp/Yaru
-	printc "	  Copy file\n" "i"
-	sudo cp -rf /tmp/Yaru/Themes/Yaru-Blue-dark /usr/share/themes
-	sudo cp -rf /tmp/Yaru/Themes/Yaru-MATE-dark /usr/share/themes
-	sudo cp -rf /tmp/Yaru/Themes/Yaru-Teal-dark /usr/share/themes
-	sudo cp -rf /tmp/Yaru/Icons/Yaru-Blue /usr/share/icons
-	sudo cp -rf /tmp/Yaru/Icons/Yaru-MATE /usr/share/icons
-	sudo cp -rf /tmp/Yaru/Icons/Yaru-Teal /usr/share/icons
-	printc "	  Removing /tmp/Yaru\n" "i"
-	sudo rm -rf /tmp/Yaru/
-	printc "	  Updating gtk icons\n" "i"
-	sudo gtk-update-icon-cache /usr/share/icons/Yaru-Blue
-	sudo gtk-update-icon-cache /usr/share/icons/Yaru-MATE
-	sudo gtk-update-icon-cache /usr/share/icons/Yaru-Teal
+		# Instal node
+		#printc "  Installing NodeJS with NVM\n" "i"
+		#curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+		#source ~/.bashrc
+		#nvm install node
+		#printc "  Checking instalation" "l"
+		#check_execution "exit"
+	fi
 
 
-	printc "	Flatery Icons\n" "i"
-	printc "	  Cloning to /tmp/Flatery\n" "i"
-	git clone https://github.com/cbrnix/Flatery.git /tmp/Flatery
-	printc "	  Copy file\n" "i"
-	sudo cp -rf /tmp/Flatery/Flatery-Blue-Dark /usr/share/icons
-	sudo cp -rf /tmp/Flatery/Flatery-Green-Dark /usr/share/icons
-	sudo cp -rf /tmp/Flatery/Flatery-Mint-Dark /usr/share/icons
-	sudo cp -rf /tmp/Flatery/Flatery-Teal-Dark /usr/share/icons
-	printc "	  Removing /tmp/Flatery\n" "i"
-	sudo rm -rf /tmp/Flatery/
-	printc "	  Updating gtk icons\n" "i"
-	sudo gtk-update-icon-cache /usr/share/icons/Flatery-Blue-Dark
-	sudo gtk-update-icon-cache /usr/share/icons/Flatery-Mint-Dark
-	sudo gtk-update-icon-cache /usr/share/icons/Flatery-Teal-Dark
-	sudo gtk-update-icon-cache /usr/share/icons/Flatery-Green-Dark
+	if [[ $THEME_ARC -eq 1 || $THEME_GRUVBOX -eq 1 || $THEME_NORDIC -eq 1 || $THEME_JUNU -eq 1 || $THEME_YARU -eq 1 ]];then
+		printc "  Installing system themes\n" "i"
+	fi
+
+	if [[ $THEME_ARC -eq 1 ]]; then
+		printc "	arc-theme\n" "i"
+		sudo apt-get install arc-theme
+	fi
+
+	if [[ $ICONS_PAPIRUS -eq 1 ]]; then
+		printc "	Papirus Icon Theme\n" "i"
+		printc "	  Cloning to $TMP_PAPIRUS\n" "i"
+		git clone https://github.com/PapirusDevelopmentTeam/papirus-icon-theme.git $TMP_PAPIRUS
+		printc "	  Copy file\n" "i"
+		sudo cp -rf $TMP_PAPIRUS/Papirus $ICONS_FOLDER
+		sudo cp -rf $TMP_PAPIRUS/Papirus-Dark $ICONS_FOLDER
+		printc "	  Removing $TMP_PAPIRUS\n" "i"
+		sudo rm -rf $TMP_PAPIRUS
+		printc "	  Updating gtk icons\n" "i"
+		sudo gtk-update-icon-cache $ICONS_FOLDER/Papirus
+		sudo gtk-update-icon-cache $ICONS_FOLDER/Papirus-Dark
+	fi
+
+	if [[ $THEME_GRUVBOX -eq 1  || $ICONS_GRUVBOX -eq 1 ]]; then
+		printc "	gruvbox-material-gtk\n" "i"
+		printc "	  Cloning to $TMP_GRUVBOX\n" "i"
+		git clone https://github.com/sainnhe/gruvbox-material-gtk $TMP_GRUVBOX
+		if [[ $THEME_GRUVBOX -eq 1 ]]; then
+			printc "	  Copy theme file\n" "i"
+			sudo cp -rf $TMP_GRUVBOX/themes/* $THEMES_FOLDER
+		fi
+		if [[ $ICONS_GRUVBOX -eq 1 ]]; then
+			GRUVBOX_ICONS_FOLDERS=("/themes/*")
+			printc "	  Copy icons file\n" "i"
+			sudo cp -rf $TMP_GRUVBOX/icons/* $ICONS_FOLDER
+			printc "	  Updating gtk icons\n" "i"
+			sudo gtk-update-icon-cache $ICONS_FOLDER/Gruvbox-Material-Dark/
+		fi
+		printc "	  Removing $TMP_GRUVBOX\n" "i"
+		sudo rm -rf $TMP_GRUVBOX
+	fi
+
+	if [[ $THEME_NORDIC -eq 1 ]]; then
+		printc "	Nordic\n" "i"
+		printc "	  Cloning to $TMP_NORDIC\n" "i"
+		sudo git clone https://github.com/EliverLara/Nordic $TMP_NORDIC
+		printc "	  Copy file\n" "i"
+		sudo cp -rf $TMP_NORDIC $THEMES_FOLDER
+		printc "	  Removing /tmp/Nordic\n" "i"
+		sudo rm -rf $TMP_NORDIC
+	fi
+
+	if [[ $THEME_JUNU -eq 1 ]]; then
+		printc "	Juno\n" "i"
+		printc "	  Cloning to $TMP_JUNO\n" "i"
+		git clone https://github.com/EliverLara/Juno $TMP_JUNO
+		printc "	  Copy file\n" "i"
+		sudo cp -rf $TMP_JUNO/ $THEMES_FOLDER
+		printc "	  Removing $TMP_JUNO\n" "i"
+		sudo rm -rf $TMP_JUNO/
+	fi
+
+	if [[ $THEME_YARU -eq 1  || $ICONS_YARU -eq 1 ]]; then
+		printc "	Yaru-Colors\n" "i"
+		printc "	  Cloning to $TMP_YARU\n" "i"
+		git clone https://github.com/Jannomag/Yaru-Colors.git $TMP_YARU
+		if [[ $THEME_YARU -eq 1 ]]; then
+			printc "	  Copy theme file\n" "i"
+			sudo cp -rf $TMP_YARU/Themes/Yaru-Blue-dark $THEMES_FOLDER
+			sudo cp -rf $TMP_YARU/Themes/Yaru-MATE-dark $THEMES_FOLDER
+			sudo cp -rf $TMP_YARU/Themes/Yaru-Teal-dark $THEMES_FOLDER
+		fi
+
+		if [[ $ICONS_YARU -eq 1 ]]; then
+			printc "	  Copy icons file\n" "i"
+			sudo cp -rf $TMP_YARU/Icons/Yaru-Blue $ICONS_FOLDER
+			sudo cp -rf $TMP_YARU/Icons/Yaru-MATE $ICONS_FOLDER
+			sudo cp -rf $TMP_YARU/Icons/Yaru-Teal $ICONS_FOLDER
+			printc "	  Updating gtk icons\n" "i"
+			sudo gtk-update-icon-cache $ICONS_FOLDER/Yaru-Blue
+			sudo gtk-update-icon-cache $ICONS_FOLDER/Yaru-MATE
+			sudo gtk-update-icon-cache $ICONS_FOLDER/Yaru-Teal
+		fi
+
+		printc "	  Removing $TMP_YARU\n" "i"
+		sudo rm -rf $TMP_YARU/
+	fi
+
+	if [[ $ICONS_FLATERY -eq 1 ]]; then
+		TMP_FLATERY="/tmp/Flatery"
+		printc "	Flatery Icons\n" "i"
+		printc "	  Cloning to $TMP_FLATERY\n" "i"
+		git clone https://github.com/cbrnix/Flatery.git $TMP_FLATERY
+		printc "	  Copy file\n" "i"
+		sudo cp -rf $TMP_FLATERY/Flatery-Blue-Dark $ICONS_FOLDER
+		sudo cp -rf $TMP_FLATERY/Flatery-Green-Dark $ICONS_FOLDER
+		sudo cp -rf $TMP_FLATERY/Flatery-Mint-Dark $ICONS_FOLDER
+		sudo cp -rf $TMP_FLATERY/Flatery-Teal-Dark $ICONS_FOLDER
+		printc "	  Removing $TMP_FLATERY\n" "i"
+		sudo rm -rf $TMP_FLATERY/
+		printc "	  Updating gtk icons\n" "i"
+		sudo gtk-update-icon-cache $ICONS_FOLDER/Flatery-Blue-Dark
+		sudo gtk-update-icon-cache $ICONS_FOLDER/Flatery-Mint-Dark
+		sudo gtk-update-icon-cache $ICONS_FOLDER/Flatery-Teal-Dark
+		sudo gtk-update-icon-cache $ICONS_FOLDER/Flatery-Green-Dark
+	fi
 
 	sudo apt autoremove -y
-# printc "  Installing terminal themes\n" "i"
-# printc "	gruvbox\n" "i"
-# clone the repo into "$HOME/src/gogh"
-# mkdir -p "$HOME/src"
-# cd "$HOME/src"
-# git clone https://github.com/Mayccoll/Gogh.git gogh
-# cd gogh/themes
-
-# necessary on ubuntu
-# export TERMINAL=gnome-terminal
-
-# install themes
-#./gruvbox-dark.sh
-
-
+else
+	printc "\n  Base distro not informed! Use -h or --help to see the options.\n\n" "i"
 fi
 
