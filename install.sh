@@ -340,6 +340,8 @@ if [[ $OS_DEBIAN -eq 1 ]]; then
 
 	sudo apt autoremove -y
 
+	printc "\n  Instalation finished" "s"
+
 elif [[ $OS_ARCH -eq 1 ]]; then
 	printc "\nStarting system configuration...\n" "i"
 	printc "Current system use ARCH as base\n" "i"
@@ -366,7 +368,7 @@ elif [[ $OS_ARCH -eq 1 ]]; then
 
 	install_themes
 
-	sudo pacman -Qdtq | pacman -Rs -
+	printc "\n  Instalation finished" "s"
 
 else
 	printc "\n  Base distro not informed! Use -h or --help to see the options.\n\n" "i"
