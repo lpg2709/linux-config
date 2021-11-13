@@ -26,6 +26,8 @@ OTHER_APPS=("jq" "clang" "ksnip" "psensor" "vlc" "gimp" "peek")
 # --- Configurations options variables ---
 OS_DEBIAN=0
 OS_ARCH=0
+DOT_FILES=0
+MY_SCRIPTS=0
 UPDATE_UPGRADE=0
 REQUIRED=0
 OTHER=0
@@ -96,6 +98,8 @@ OPTIONS:
   -a,  --arch            Configuration for Arch based linux.
   -r,  --required        Install the required programs.
   -o,  --other           Install the other programs.
+  -df, --dot-files       Install my dot-files configurations.
+  -ms, --my-scripts      Install my scripts.
        --all             Install all configuration.
        --theme-all       Install all themes.
        --icons-all       Install all icons.
@@ -130,6 +134,12 @@ while (( "$#" )); do
 	fi
 	if [[ "$1" == "--other" || "$1" == "-o" ]]; then
 		OTHER=1
+	fi
+	if [[ "$1" == "--dot-files" || "$1" == "-df" ]]; then
+		DOT_FILES=1
+	fi
+	if [[ "$1" == "--my-scripts" || "$1" == "-ms" ]]; then
+		MY_SCRIPTS=1
 	fi
 	if [[ "$1" == "--all" ]]; then
 		REQUIRED=1
@@ -374,3 +384,21 @@ else
 	printc "\n  Base distro not informed! Use -h or --help to see the options.\n\n" "i"
 fi
 
+if [[ $MY_SCRIPTS -eq 1 ]]; then
+	printc "\Installing My scripts...\n" "i"
+	curl -o- https://raw.githubusercontent.com/lpg2709/my-shellscritps/master/install.sh --silent | sudo bash
+	printc "  Checking instalation" "l"
+	check_execution "exit"
+fi
+
+if [[ $DOT_FILES -eq 1 ]]; then
+	printc "\Installing tmux configuration...\n" "i"
+	curl -o- https://raw.githubusercontent.com/lpg2709/tmux-config/master/install.sh --silent | sudo bash
+	printc "  Checking instalation" "l"
+	check_execution
+
+	printc "\Installing vim configuration...\n" "i"
+	# curl -o- https://raw.githubusercontent.com/lpg2709/vim-config/master/install.sh --silent | sudo bash
+	printc "  Checking instalation" "l"
+	check_execution
+fi
