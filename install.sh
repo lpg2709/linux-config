@@ -8,7 +8,7 @@
 #Get OS info
 #os_info=$(cat /etc/[A-Za-z]*[-][rv]e[lr]*)
 
-# Constants configuration
+# --- Constants configuration ---
 ICONS_FOLDER="/usr/share/icons"
 THEMES_FOLDER="/usr/share/themes"
 
@@ -20,7 +20,10 @@ TMP_YARU="/tmp/Yaru"
 
 PAPIRUS_ICONS_FOLDERS=("Papirus" "Papirus-Dark")
 
-# Configurations options variables
+REQUIRED_APPS=("net-tools" "vim" "git" "gcc" "make" "cmake" "python3" "curl" "htop" "tmux")
+OTHER_APPS=("jq" "clang" "ksnip" "psensor" "vlc" "gimp" "peek")
+
+# --- Configurations options variables ---
 OS_DEBIAN=0
 OS_ARCH=0
 UPDATE_UPGRADE=0
@@ -38,6 +41,7 @@ ICONS_GRUVBOX=0
 ICONS_YARU=0
 ICONS_FLATERY=0
 
+# --- FUNCTIONS ---
 # Print pretty color output
 #  $1: The message to be printed with the color level
 #  $2: The message level
@@ -80,6 +84,7 @@ function check_execution(){
 	fi
 
 }
+
 
 read -r -d "" USAGE <<- EOM
 Usage: sudo ./install.sh [OPTIONS]
@@ -190,39 +195,7 @@ if [[ ICONS_ALL -eq 1 ]]; then
 	ICONS_FLATERY=1
 fi
 
-if [[ $OS_DEBIAN -eq 1 ]]; then
-	printc "\nStarting system configuration...\n" "i"
-	printc "Current system use debian as base\n" "i"
-	printc "  Checking package maneger (apt-get)" "l"
-	apt-get -v > /dev/null
-	check_execution "exit"
-	if [[ $UPDATE_UPGRADE -eq 1 ]]; then
-		printc "  Updating the system\n" "i"
-		sudo apt update && sudo apt upgrade -y
-	fi
-	if [[ $REQUIRED -eq 1 ]]; then
-		printc "  Installing major programs ( build-essential | net-tools | vim | git | gcc | make | cmake | python3 | curl | wget | htop )\n" "i"
-		sudo apt-get install build-essential net-tools vim git gcc make cmake python3 curl wget htop -y
-		printc "  Checking instalation" "l"
-		check_execution "exit"
-	fi
-
-	if [[ $OTHER -eq 1 ]]; then
-		printc "  Installing other programs ( jq | clang | ksnip | psensor | vlc | gimp | peek | vim-gtk )\n" "i"
-		sudo apt-get install jq clang ksnip psensor vlc gimp peek vim-gtk -y
-		printc "  Checking instalation" "l"
-		check_execution "exit"
-
-		# Instal node
-		#printc "  Installing NodeJS with NVM\n" "i"
-		#curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-		#source ~/.bashrc
-		#nvm install node
-		#printc "  Checking instalation" "l"
-		#check_execution "exit"
-	fi
-
-
+function install_themes(){
 	if [[ $THEME_ARC -eq 1 || $THEME_GRUVBOX -eq 1 || $THEME_NORDIC -eq 1 || $THEME_JUNU -eq 1 || $THEME_YARU -eq 1 ]];then
 		printc "  Installing system themes\n" "i"
 	fi
@@ -329,8 +302,72 @@ if [[ $OS_DEBIAN -eq 1 ]]; then
 		sudo gtk-update-icon-cache $ICONS_FOLDER/Flatery-Teal-Dark
 		sudo gtk-update-icon-cache $ICONS_FOLDER/Flatery-Green-Dark
 	fi
+}
+
+if [[ $OS_DEBIAN -eq 1 ]]; then
+	printc "\nStarting system configuration...\n" "i"
+	printc "Current system use DEBIAN as base\n" "i"
+	printc "  Checking package maneger (apt-get)" "l"
+	apt-get -v > /dev/null
+	check_execution "exit"
+	if [[ $UPDATE_UPGRADE -eq 1 ]]; then
+		printc "  Updating the system\n" "i"
+		sudo apt update && sudo apt upgrade -y
+	fi
+	if [[ $REQUIRED -eq 1 ]]; then
+		printc "  Installing major programs ( ${REQUIRED_APPS[*]} )\n" "i"
+		sudo apt-get install build-essential ${REQUIRED_APPS[@]} -y
+		printc "  Checking instalation" "l"
+		check_execution "exit"
+	fi
+
+	if [[ $OTHER -eq 1 ]]; then
+		printc "  Installing other programs ( ${OTHER_APPS[*]} )\n" "i"
+		sudo apt-get install ${OTHER_APPS[@]} y
+		printc "  Checking instalation" "l"
+		check_execution "exit"
+
+		# Instal node
+		#printc "  Installing NodeJS with NVM\n" "i"
+		#curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+		#source ~/.bashrc
+		#nvm install node
+		#printc "  Checking instalation" "l"
+		#check_execution "exit"
+	fi
+
+	install_themes
 
 	sudo apt autoremove -y
+
+elif [[ $OS_ARCH -eq 1 ]]; then
+	printc "\nStarting system configuration...\n" "i"
+	printc "Current system use ARCH as base\n" "i"
+	printc "  Checking package maneger (pacman)" "l"
+	pacman -V > /dev/null
+	check_execution "exit"
+	if [[ $UPDATE_UPGRADE -eq 1 ]]; then
+		printc "  Updating the system\n" "i"
+		sudo pacman -Syu --noconfirm
+	fi
+	if [[ $REQUIRED -eq 1 ]]; then
+		printc "  Installing major programs ( ${REQUIRED_APPS[*]} )\n" "i"
+		sudo pacman -S base-devel ${REQUIRED_APPS[@]} --noconfirm
+		printc "  Checking instalation" "l"
+		check_execution "exit"
+	fi
+
+	if [[ $OTHER -eq 1 ]]; then
+		printc "  Installing other programs ( ${OTHER_APPS[*]} )\n" "i"
+		sudo pacman -S ${OTHER_APPS[@]} --noconfirm
+		printc "  Checking instalation" "l"
+		check_execution "exit"
+	fi
+
+	install_themes
+
+	sudo pacman -Qdtq | pacman -Rs -
+
 else
 	printc "\n  Base distro not informed! Use -h or --help to see the options.\n\n" "i"
 fi
