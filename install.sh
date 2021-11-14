@@ -398,7 +398,7 @@ if [[ $DOT_FILES -eq 1 ]]; then
 	check_execution
 
 	printc "\Installing vim configuration...\n" "i"
-	# curl -o- https://raw.githubusercontent.com/lpg2709/vim-config/master/install.sh --silent | sudo bash
+	curl -o- https://raw.githubusercontent.com/lpg2709/vim-config/master/install.sh --silent | sudo bash
 	printc "  Checking instalation" "l"
 	check_execution
 fi
