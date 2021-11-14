@@ -1,6 +1,6 @@
 # My linux configuration
 
-Personal configuration for linux system. Configure and install moust useful programs, form me.
+Personal configuration for linux system. Configure and install moust useful programs, for me.
 
 # install
 
