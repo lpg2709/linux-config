@@ -21,7 +21,7 @@ TMP_YARU="/tmp/Yaru"
 PAPIRUS_ICONS_FOLDERS=("Papirus" "Papirus-Dark")
 
 REQUIRED_APPS=("net-tools" "vim" "git" "gcc" "make" "cmake" "python3" "curl" "htop" "tmux")
-OTHER_APPS=("jq" "clang" "ksnip" "psensor" "vlc" "gimp" "peek")
+OTHER_APPS=("jq" "clang" "ksnip" "psensor" "vlc" "gimp" "peek", "xreader", "xviewer", "baobab", "gnome-disk-utility")
 
 # --- Configurations options variables ---
 OS_DEBIAN=0
