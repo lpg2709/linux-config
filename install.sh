@@ -364,7 +364,8 @@ elif [[ $OS_ARCH -eq 1 ]]; then
 	fi
 	if [[ $REQUIRED -eq 1 ]]; then
 		printc "  Installing major programs ( ${REQUIRED_APPS[*]} )\n" "i"
-		sudo pacman -S base-devel ${REQUIRED_APPS[@]} --noconfirm
+		# The 'exempi' is a dependency for xviewer work on arch.
+		sudo pacman -S base-devel exempi ${REQUIRED_APPS[@]} --noconfirm
 		printc "  Checking instalation" "l"
 		check_execution "exit"
 	fi
