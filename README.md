@@ -1,5 +1,7 @@
 # My linux configuration
 
+> Not used anymore, transferred to https://github.com/lpg2709/lpg-linux
+
 Personal configuration for linux system. Configure and install moust useful programs, for me.
 
 # install
